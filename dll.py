@@ -22,13 +22,18 @@ class DoublyLinkedList():
             node.right = self.head
             self.head = node
 
-    def append_tail(self,node):
-        #insert head on the first insert or initialise the list with one element when the list is created.
+    def append_tail(self,node,make_circular=False):
+        if(self.head is None):
+            self.head = node
+            return
         temp = self.head
         while(temp.right is not None):
             temp = temp.right
         node.left = temp
         temp.right=node
+        if(make_circular):
+            node.right=self.head
+            self.head.left = node
 
     def delete_node(self,node):
         if(self.head is None):
@@ -39,14 +44,38 @@ class DoublyLinkedList():
             self.head = self.head.right
         temp = self.head
         while(temp is not None and temp != node):
-        	print(temp)
         	temp=temp.right
         if(temp is None):
             print("element not found")
         else:
         	node.left.right = temp.right
         	if node.right is not None:
-        		node.right.left = temp.left 
+        		node.right.left = temp.left
+    def plot(self):
+        circular = self.head.left is not None
+        temp = self.head.right
+        x = []
+        y = []
+        while temp is not None and temp != self.head:
+            x.append(temp.x)
+            y.append(temp.y)
+            temp=temp.right
+        if(circular):
+            x.append(x[0])
+            y.append(y[0])
+        plt_polygon(x,y)
+
+    def first_reflex_node(self):
+        temp = self.head.right
+        v_num = None
+        while(temp!= self.head): #reflex test is always for a circular list
+            if(ccw(temp.left,temp,temp.right) <0 ):# we will remove all straight edges. degenerate, ignore for now
+                v_num = temp.v_num
+                print(temp.x,temp.y)
+                break
+            temp = temp.right
+        return v_num
+
 
 def instersection(a,b,c,d):
 	r = ((a.y-c.y)*(d.x-c.x)-(a.x-c.x)*(d.y-c.y))/((b.x-a.x)*(d.y-c.y)-(b.y-a.y)*(d.x-c.x))
@@ -61,9 +90,42 @@ def ccw(a,b,c):
 
 
 def plt_polygon(x,y):
-	plt.plot(x,y)
-	plt.show()
+    plt.plot(x,y)
+    plt.show()
 
+#inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
+inpt = [(1,1),(2,2),(1,3),(0,2)]
+x = [i[0] for i in inpt]
+y = [i[1] for i in inpt]
+#plt_polygon(x,y) 
+
+P = DoublyLinkedList()
+
+n = len(inpt)
+
+for i,pt in enumerate(inpt):
+    node = Node(i,pt[0],pt[1])
+    P.append_tail(node)
+
+#hack to avoid multiple ifs
+P.delete_node(node)
+P.append_tail(node, make_circular=True)
+#P.plot()
+
+#remove all straight edges :/
+K = DoublyLinkedList()
+
+ref_v = P.first_reflex_node()
+
+
+if(ref_v is None):
+    print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
+
+
+
+
+
+"""
 a = Node(0,1,2)
 b = DoublyLinkedList()
 b.append_head(a)
@@ -84,4 +146,4 @@ print(instersection(a,b,c,d))
 x = [a.x,b.x,c.x,d.x]
 y = [a.y,b.y,c.y,d.y]
 plt_polygon(x,y)
-
+"""
