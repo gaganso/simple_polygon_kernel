@@ -1,4 +1,11 @@
 import matplotlib.pyplot as plt
+import math
+
+inf_d = 1000000
+
+#TODO: A function is_circular
+#TODO: If the number of vertices is less than or equal to 3, 
+#TODO: Remove all straight edges
 
 class Node(object):
     def __init__(self, num, x, y):
@@ -18,19 +25,28 @@ class DoublyLinkedList():
             self.head = node
             #self.tail=
         else:
-            self.head.left = node
+            node.left = self.head.left
             node.right = self.head
+            self.head.left = node
             self.head = node
 
     def append_tail(self,node,make_circular=False):
         if(self.head is None):
             self.head = node
             return
-        temp = self.head
-        while(temp.right is not None):
-            temp = temp.right
-        node.left = temp
-        temp.right=node
+        is_circular = self.head.left is not None
+
+        if(is_circular):
+            node.right=self.head
+            node.left = self.head.left
+            self.head.left.right = node
+            self.head.left = node
+        else:
+            temp = self.head
+            while(temp.right is not None):
+                temp = temp.right
+            node.left = temp
+            temp.right=node
         if(make_circular):
             node.right=self.head
             self.head.left = node
@@ -39,23 +55,32 @@ class DoublyLinkedList():
         if(self.head is None):
             print("empty list")
             return
-        #will also be circular list XD Think about cases.
-        if self.head==node:
-            self.head = self.head.right
-        temp = self.head
-        while(temp is not None and temp != node):
-        	temp=temp.right
-        if(temp is None):
-            print("element not found")
+
+        is_circular = self.head.left is not None
+
+        if(is_circular):
+            temp = self.head.right
+            while(temp!=self.head and temp!=node):
+                temp = temp.right
         else:
-        	node.left.right = temp.right
-        	if node.right is not None:
-        		node.right.left = temp.left
+            temp = self.head
+            while(temp is not None and temp != node):
+                temp=temp.right
+
+        if(temp==node):
+            if self.head==node:
+                self.head = self.head.right
+            if temp.left is not None:
+                temp.left.right = node.right
+            if temp.right is not None:
+                temp.right.left = node.left
+        else:
+            print("Unable to delete node")
     def plot(self):
         circular = self.head.left is not None
         temp = self.head.right
-        x = []
-        y = []
+        x = [self.head.x]
+        y = [self.head.y]
         while temp is not None and temp != self.head:
             x.append(temp.x)
             y.append(temp.y)
@@ -67,14 +92,45 @@ class DoublyLinkedList():
 
     def first_reflex_node(self):
         temp = self.head.right
-        v_num = None
+        node = None
         while(temp!= self.head): #reflex test is always for a circular list
             if(ccw(temp.left,temp,temp.right) <0 ):# we will remove all straight edges. degenerate, ignore for now
-                v_num = temp.v_num
-                print(temp.x,temp.y)
+                node = temp
                 break
             temp = temp.right
-        return v_num
+        return node
+
+    def reset_v_num(self,node):
+        temp = self.head.right
+        while(temp!=self.head):
+            if temp == node:
+                break
+            temp = temp.right
+
+        if(temp == node):
+            i = 0
+            node.v_num = i
+            self.head = node
+            temp = temp.right
+            while(temp!=node):
+                i+=1
+                temp.v_num = i
+                temp = temp.right
+        else:
+            print("the reflex edge vertex doesn't exist.")
+
+    def print(self):
+        temp = self.head
+
+        print("v_num:%d\t(x,y):(%d,%d)\n"%(temp.v_num,temp.x,temp.y))
+        temp = temp.right
+
+        while(temp!=self.head and temp.right is not None):
+            print("v_num:%d\t(x,y):(%d,%d)\n"%(temp.v_num,temp.x,temp.y))
+            temp = temp.right
+
+
+
 
 
 def instersection(a,b,c,d):
@@ -93,8 +149,16 @@ def plt_polygon(x,y):
     plt.plot(x,y)
     plt.show()
 
-#inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
-inpt = [(1,1),(2,2),(1,3),(0,2)]
+def inf_coord(a,b):
+    v = (b.x - a.x, b.y - a.y)
+    v_mod = math.sqrt(v[0]**2+v[1]**2)
+    u = (v[0]/v_mod,v[1]/v_mod)
+    return (a.x - inf_d*u[0],a.y - inf_d*u[1])
+
+
+inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
+#inpt = [(1,1),(2,2),(1,3),(0,2)]
+#inpt = [(2,2),(4,4),(2,3),(1,4)]
 x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 #plt_polygon(x,y) 
@@ -112,14 +176,36 @@ P.delete_node(node)
 P.append_tail(node, make_circular=True)
 #P.plot()
 
-#remove all straight edges :/
+
+
+P.print()
+
+r_node = P.first_reflex_node()
+
+if(r_node is None):
+    print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
+
+P.reset_v_num(r_node)
+P.print()
+
+
 K = DoublyLinkedList()
 
-ref_v = P.first_reflex_node()
+p = inf_coord(r_node,r_node.right) #1st edge. infinity-r_node
+q = inf_coord(r_node,r_node.left) #2nd edge. r_node-infinity
+
+print(p,q)
+print((p[1]-r_node.y)/(p[0]-r_node.x))
+print((r_node.right.y-r_node.y)/(r_node.right.x-r_node.x))
+
+print((q[1]-r_node.y)/(q[0]-r_node.x))
+print((r_node.left.y-r_node.y)/(r_node.left.x-r_node.x))
+
+#initialise K1
+
+#point at infinity should be along e1
 
 
-if(ref_v is None):
-    print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
 
 
 
