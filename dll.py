@@ -2,11 +2,14 @@ import matplotlib.pyplot as plt
 import math
 import copy
 import sys
-inf_d = 10
+inf_d = 100
+win_size = 20
+N = 8 #number of points
 
 #TODO: A function is_circular
 #TODO: If the number of vertices is less than or equal to 3, 
 #TODO: Remove all straight edges
+#TODO: Constant size window.
 
 class Node(object):
     def __init__(self, num, x, y):
@@ -155,7 +158,7 @@ def is_reflex(node):
 
 
 #division by zero error, robust
-def instersection(a,b,c,d):
+def intersection(a,b,c,d):
     dtr = ((b.x-a.x)*(d.y-c.y)-(b.y-a.y)*(d.x-c.x))
     if(math.isclose(dtr,0)):
         print("lines are parallel.degenerate case")
@@ -167,6 +170,10 @@ def instersection(a,b,c,d):
 #    if((r >0 or math.isclose(r,0)) and (r<1 or math.isclose(r,1)) and (s>0 or math.isclose(s,0)) and (s<1 or math.isclose(s,1))):
     if(r >=0 and r<=1  and s>=0 and s<=1 ):
         return (a.x+r*(b.x-a.x),a.y+r*(b.y-a.y))
+    elif(is_between(a,c,b)):
+        return (c.x,c.y)
+    elif(is_between(a,d,b)):
+        return (d.x,d.y)
     else:
         return None
 
@@ -194,17 +201,26 @@ def distance(a,b):
 def is_between(a,c,b):
     return math.isclose(distance(a,c) + distance(c,b), distance(a,b))
 
+def display():
+    plt.axis([0,win_size,0,win_size])
+    plt.plot(F1.x,F1.y,marker='o', c='k')
+    plt.plot(L1.x,L1.y,marker='o', c='b')
+    plt.plot(vi.x,vi.y,marker='x',c='r')
+    P.plot()
+    K.plot()
+    plt.show()
+
 
 print("Please click")
-plt.axis([0,10,0,10])
+plt.axis([0,win_size,0,win_size])
 plt.plot()
-inpt = plt.ginput(6,show_clicks=True)
+inpt = plt.ginput(N,show_clicks=True)
 print("clicked", inpt)
 x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 
 
-inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
+#inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
 """
 #inpt = [(3,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(2,11.5),(3,8.5),(3,6),(4,4)]
 inpt = [(1,1),(2,2),(1,3),(0,2)] #convex 
@@ -229,6 +245,7 @@ for i,pt in enumerate(inpt):
 P.delete_node(node)
 P.append_tail(node, make_circular=True)
 P.plot()
+plt.axis([-win_size,win_size,-win_size,win_size])
 plt.show()
 
 
@@ -236,6 +253,7 @@ r_node = P.first_reflex_node()
 
 if(r_node is None):
     print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
+    plt.axis([-win_size,win_size,win_size,win_size])
     plt.show()
     sys.exit()
 
@@ -250,13 +268,6 @@ K = DoublyLinkedList()
 F1 = inf_coord(vi,vi.right) #1st edge. infinity-r_node
 L1 = inf_coord(vi,vi.left) #2nd edge. r_node-infinity
 
-print(F1,L1)
-print((F1[1]-vi.y)/(F1[0]-vi.x))
-print((vi.right.y-vi.y)/(vi.right.x-vi.x))
-
-print((L1[1]-vi.y)/(L1[0]-vi.x))
-print((vi.left.y-vi.y)/(vi.left.x-vi.x))
-
 
 F1 = Node(0,F1[0],F1[1])
 L1 = Node(1,L1[0],L1[1])
@@ -266,23 +277,14 @@ K.append_head(L1)
 
 
 vi = vi.right
-#K1 is done
 
 
-#loop through all the vertices now
-
-print(is_reflex(vi))
-
-i = 1
 
 
     
-plt.plot(F1.x,F1.y,marker='o', c='k')
-plt.plot(L1.x,L1.y,marker='o', c='b')
-plt.plot(vi.x,vi.y,marker='x',c='r')
-P.plot()
-K.plot()
-plt.show()
+display()
+
+i = 1
 while(i<n-1):
 
     if(is_reflex(vi)): #vertex i is reflex
@@ -297,7 +299,7 @@ while(i<n-1):
             wt1 = F1
             wt2 = F1.left
             while(wt1!=L1):
-                p = instersection(wt2,wt1,vi.right,vi_next_inf)
+                p = intersection(wt2,wt1,vi.right,vi_next_inf)
                 if(p is not None):
                     w_d = Node(0,p[0],p[1])
                     break
@@ -309,7 +311,7 @@ while(i<n-1):
             ws2 = F1
             ws1 = F1.right
             while(ws1 is not None and ws1.right is not None):
-                q = instersection(ws1,ws2,vi.right,vi_next_inf)
+                q = intersection(ws1,ws2,vi.right,vi_next_inf)
                 if(q is not None):
                     w_dd = Node(0,q[0],q[1])
                     break
@@ -343,7 +345,7 @@ while(i<n-1):
                     wr2 = tail
                     wr1 = tail.right
                     while(wr1.right is not None):
-                        q = instersection(wr1,wr2,vi.right,vi_next_inf)
+                        q = intersection(wr1,wr2,vi.right,vi_next_inf)
                         if(q is not None):
                             w_dd = Node(0,q[0],q[1])
                             break
@@ -442,7 +444,13 @@ while(i<n-1):
             wt2 = L1
             wt1 = L1.right
             while(wt2!=F1):
-                p = instersection(wt2,wt1,vi,vi_next_inf)
+                p = intersection(wt2,wt1,vi,vi_next_inf)
+                wt2.print()
+                wt1.print()
+                vi.print()
+                vi_next_inf.print()
+                if(i==2):
+                    print(is_between(wt2,vi,wt1))
                 if(p is not None):
                     w_d = Node(0,p[0],p[1])
                     break
@@ -454,7 +462,7 @@ while(i<n-1):
             ws1 = L1
             ws2 = L1.left
             while(ws2 is not None and ws2.left is not None):
-                q = instersection(ws1,ws2,vi,vi_next_inf)
+                q = intersection(ws1,ws2,vi,vi_next_inf)
                 if(q is not None):
                     w_dd = Node(0,q[0],q[1])
                     break
@@ -487,7 +495,7 @@ while(i<n-1):
                     wr1 = head
                     wr2 = head.left
                     while(wr2.left is not None):
-                        q = instersection(wr1,wr2,vi,vi_next_inf)
+                        q = intersection(wr1,wr2,vi,vi_next_inf)
                         if(q is not None):
                             w_dd = Node(0,q[0],q[1])
                             break
@@ -542,22 +550,19 @@ while(i<n-1):
                         w2 = w2.left
                     if(w2 is None):
                         L1 = L1 #TODO: delete later
+
     vi=vi.right
     print("iter %d"%i)
     i+=1
 
     print("F",F1.x,F1.y)
     print("L",L1.x,L1.y)
-    plt.plot(F1.x,F1.y,marker='o', c='k')
-    plt.plot(L1.x,L1.y,marker='o', c='b')
-    plt.plot(vi.x,vi.y,marker='x',c='r')
-    P.plot()
-    K.plot()
-    plt.show()
+    display()
 
 P.plot()
 K.plot()
 
+plt.axis([-win_size,win_size,-win_size,win_size])
 plt.show()
 
 
@@ -588,7 +593,7 @@ a=Node(0,0,0)
 b=Node(1,3,3)
 c=Node(2,0,4)
 d=Node(3,4,0)
-print(instersection(a,b,c,d))
+print(intersection(a,b,c,d))
 x = [a.x,b.x,c.x,d.x]
 y = [a.y,b.y,c.y,d.y]
 plt_polygon(x,y)
