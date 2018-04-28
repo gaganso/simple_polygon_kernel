@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import math
 import copy
 import sys
-inf_d = 100
+inf_d = 20
 win_size = 20
 N = 12 #number of points
 
@@ -36,6 +36,15 @@ class DoublyLinkedList():
             node.right = self.head
             self.head.left = node
             self.head = node
+
+    def append_k(self,node):
+        if(self.head is None):
+            self.head = node
+            self.tail= node
+        else:
+            node.right = self.tail
+            self.tail.left = node
+            self.tail = node
 
     def append_tail(self,node,make_circular=False):
         if(self.head is None):
@@ -105,11 +114,28 @@ class DoublyLinkedList():
                 temp=temp.right
         plt_polygon(x,y)
     
-    def kplot(self,n):
-        circular = self.head.left is not None
+    def kplot(self):
         x = []
         y = []
-
+        if(self.head == self.tail):
+            print("ssss")
+            temp = self.head.right
+            x.append(self.head.x)
+            y.append(self.head.y)
+            while temp != self.head:
+                x.append(temp.x)
+                y.append(temp.y)
+                temp=temp.right
+                print(temp.print())
+            x.append(x[0])
+            y.append(y[0])
+        else:
+            temp=self.head
+            while temp is not None:
+                x.append(temp.x)
+                y.append(temp.y)
+                temp=temp.left
+        plt_polygon(x,y)
     def first_reflex_node(self):
         temp = self.head.right
         node = None
@@ -165,8 +191,6 @@ def intersection(a,b,c,d):
         return None
     r = ((a.y-c.y)*(d.x-c.x)-(a.x-c.x)*(d.y-c.y))/dtr
     s = ((a.y-c.y)*(b.x-a.x)-(a.x-c.x)*(b.y-a.y))/dtr
-    print("r and s")
-    print(r,s)
 #    if((r >0 or math.isclose(r,0)) and (r<1 or math.isclose(r,1)) and (s>0 or math.isclose(s,0)) and (s<1 or math.isclose(s,1))):
     if(r >=0 and r<=1  and s>=0 and s<=1 ):
         return (a.x+r*(b.x-a.x),a.y+r*(b.y-a.y))
@@ -207,9 +231,16 @@ def display():
     plt.plot(L1.x,L1.y,marker='o', c='b')
     plt.plot(vi.x,vi.y,marker='x',c='r')
     P.plot()
-    K.plot()
+    K.kplot()
     plt.show()
 
+"""
+a = Node(0,15.866935483870968,5.232683982683984)
+b = Node(0,-6.321148797313381,7.093697545229208)
+c = Node(0,22.24035695862105,18.020950432975354)
+
+print(ccw(a,b,c))
+"""
 
 print("Please click")
 plt.axis([0,win_size,0,win_size])
@@ -220,7 +251,7 @@ x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 
 
-#inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
+inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
 """
 #inpt = [(3,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(2,11.5),(3,8.5),(3,6),(4,4)]
 inpt = [(1,1),(2,2),(1,3),(0,2)] #convex 
@@ -230,7 +261,7 @@ y = [i[1] for i in inpt]
 #plt_polygon(x,y) 
 """
 #inpt = [(1.723790322580645, 2.8192640692640696), (4.737903225806452, 4.0909090909090917), (8.4778225806451601, 1.5476190476190479), (8.5181451612903221, 6.8641774891774894), (2.0766129032258065, 9.7997835497835517), (0.42338709677419351, 3.9826839826839828)]
-inpt = [(3.588709677419355, 3.4199134199134198), (6.4919354838709671, 5.6926406926406923), (13.608870967741936, 5.4220779220779232), (15.866935483870968, 5.2326839826839837), (16.693548387096772, 10.50865800865801), (11.068548387096772, 11.212121212121213), (9.3951612903225801, 17.353896103896105), (3.9516129032258061, 18.354978354978357), (8.125, 13.511904761904763), (2.520161290322581, 10.535714285714286), (1.55241935483871, 7.1807359307359313), (1.028225806451613, 1.3365800865800868)]
+#inpt = [(3.588709677419355, 3.4199134199134198), (6.4919354838709671, 5.6926406926406923), (13.608870967741936, 5.4220779220779232), (15.866935483870968, 5.2326839826839837), (16.693548387096772, 10.50865800865801), (11.068548387096772, 11.212121212121213), (9.3951612903225801, 17.353896103896105), (3.9516129032258061, 18.354978354978357), (8.125, 13.511904761904763), (2.520161290322581, 10.535714285714286), (1.55241935483871, 7.1807359307359313), (1.028225806451613, 1.3365800865800868)]
 
 x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
@@ -255,7 +286,7 @@ r_node = P.first_reflex_node()
 
 if(r_node is None):
     print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
-    plt.axis([-win_size,win_size,win_size,win_size])
+    plt.axis([0,win_size,0,win_size])
     plt.show()
     sys.exit()
 
@@ -273,28 +304,21 @@ L1 = inf_coord(vi,vi.left) #2nd edge. r_node-infinity
 
 F1 = Node(0,F1[0],F1[1])
 L1 = Node(1,L1[0],L1[1])
-K.append_head(F1)
-K.append_head(copy.deepcopy(vi))
-K.append_head(L1)
+K.append_k(F1)
+K.append_k(copy.deepcopy(vi))
+K.append_k(L1)
 
 
 vi = vi.right
 
 
-
-
-    
-display()
-
 i = 1
 while(i<n-1):
-
+    display()
     if(is_reflex(vi)): #vertex i is reflex
         vi_next_inf = inf_coord(vi,vi.right)
         vi_next_inf = Node(0,vi_next_inf[0],vi_next_inf[1])
-        left_test = ccw(vi_next_inf,vi.right,F1)
-
-
+        left_test = ccw(vi_next_inf,vi.right, F1)
         if(left_test<0 or math.isclose(left_test,0)): #F1 lies on or right of the vi+1 to inf line
             p = None
             q = None
@@ -312,62 +336,51 @@ while(i<n-1):
                 sys.exit(0)
             ws2 = F1
             ws1 = F1.right
-            while(ws1 is not None and ws1.right is not None):
-                q = intersection(ws1,ws2,vi.right,vi_next_inf)
+            while(ws1 is not None): #not checked
+                q = intersection(ws2,ws1,vi.right,vi_next_inf)
                 if(q is not None):
                     w_dd = Node(0,q[0],q[1])
                     break
                 ws2 = ws1
                 ws1 = ws1.right
             if(q is None):
-                #find tail and head end to find if the edge under consideration is comprised withing the slopes of the two infinity lines
-                l_end1=L1
-                if(L1.left is not None):
-                    l_end2 = L1.left
-                else:
-                    l_end1 = L1.right
-                    l_end2 = L1
-                while(l_end2.left is not None):
-                    l_end1 = l_end2
-                    l_end2 = l_end2.left
-                r_end = F1
-                while(r_end.right is not None):
-                    r_end = r_end.right
+                tail_end2 = K.tail
+                tail_end1 = tail_end2.right
+                head_end = K.head
+
                 #product of two left tests should be the same=> slope within the slopes of end half lines
-                if((ccw(l_end1,l_end2,vi_next_inf)  * ccw(vi.right,vi_next_inf, r_end)) > 0): #slope is comprised bw the slopes of the two half lines
+                if((ccw(tail_end1,tail_end2,vi_next_inf)  * ccw(vi.right,vi_next_inf, head_end)) > 0): #slope is comprised bw the slopes of the two half lines
                     wt2.right = w_d
                     w_d.left = wt2
                     w_d.right = vi_next_inf
                     vi_next_inf.left = w_d
+                    vi_next_inf.right = None
+                    K.head = vi_next_inf
                 #if slope is not comprised withing the two end half lines, the edge will pierce the current K at two points making it bounded.
                 else:
-                    tail = L1
-                    while(tail.left is not None):
-                        tail = tail.left
-                    wr2 = tail
-                    wr1 = tail.right
-                    while(wr1.right is not None):
+                    wr2 = K.tail
+                    wr1 = K.tail.right
+                    while(True): #warning
                         q = intersection(wr1,wr2,vi.right,vi_next_inf)
                         if(q is not None):
                             w_dd = Node(0,q[0],q[1])
                             break
-
                     wt2.right = w_d
                     w_d.left = wt2
                     w_d.right = w_dd
                     w_dd.left = w_d
                     w_dd.right = wr1
                     wr1.left = w_dd
-                    K.head = wt2
+                    K.tail = K.head = wt2
     
                     #change Ki
                     #list becomes circular. change head to tail when Ki becomes bounded
             else:
                 w_d.left = wt2
+                wt2.right = w_d
                 w_d.right = w_dd
                 w_dd.left = w_d
                 w_dd.right = ws1
-                wt2.right = w_d
                 ws1.left = w_dd
 
             if(q is None):
@@ -383,12 +396,6 @@ while(i<n-1):
                     break
                 w1 = w2
                 w2 = w2.left
-
-            if(w2 is None):
-                L1 = L1 #TODO: delete later
-
-
-
 
         #Ki+1 = Ki since the intersection of the new half plane and the current kernel is the current kernel itself
         else:
@@ -410,14 +417,12 @@ while(i<n-1):
                     break
                 w1=w2
                 w2=w2.left
-            if(w2 is None):
-                L1 = L1 #TODO: delete later
-
         
     else:
         vi_next_inf = inf_coord(vi,vi.right,along_b=True)
         vi_next_inf = Node(0,vi_next_inf[0],vi_next_inf[1])
-        if(ccw(vi,vi_next_inf,L1)>0):
+        if(ccw(vi,vi_next_inf,L1)>0): # L1 is to the left. Ki+1 = Ki
+            #case 12 F1
             w1 = F1
             w2 = F1.left
             while(w2 is not None):
@@ -426,20 +431,15 @@ while(i<n-1):
                     break
                 w1 = w2
                 w2 = w2.left
-            if(K.head.left is not None): #unbounded
-                #case11 with L1
+            if(K.head == K.tail): #bounded
                 w1 = L1
                 w2 = L1.left
                 while(w2 is not None):
                     if(ccw(vi.right,w1,w2)>0):
                         L1 = w1
                         break
-                    w1 = w2
-                    w2 = w2.left
-                if(w2 is None):
-                    L1 = L1 #TODO: delete later
-            else:
-                L1 = L1 #TODO: Remove
+                    w1=w2
+                    w2=w2.left
         else:
             p = None
             q = None
@@ -447,12 +447,6 @@ while(i<n-1):
             wt1 = L1.right
             while(wt2!=F1):
                 p = intersection(wt2,wt1,vi,vi_next_inf)
-                wt2.print()
-                wt1.print()
-                vi.print()
-                vi_next_inf.print()
-                if(i==2):
-                    print(is_between(wt2,vi,wt1))
                 if(p is not None):
                     w_d = Node(0,p[0],p[1])
                     break
@@ -463,7 +457,7 @@ while(i<n-1):
                 sys.exit(0)
             ws1 = L1
             ws2 = L1.left
-            while(ws2 is not None and ws2.left is not None):
+            while(ws2 is not None):
                 q = intersection(ws1,ws2,vi,vi_next_inf)
                 if(q is not None):
                     w_dd = Node(0,q[0],q[1])
@@ -471,32 +465,20 @@ while(i<n-1):
                 ws1 = ws2
                 ws2 = ws2.left
             if(q is None):
-                l_end1=L1
-                if(L1.left is not None):
-                    l_end2 = L1.left
-                else:
-                    l_end1 = L1.right
-                    l_end2 = L1
-                while(l_end2.left is not None):
-                    l_end1 = l_end2
-                    l_end2 = l_end2.left
-                r_end = F1
-                while(r_end.right is not None):
-                    r_end = r_end.right
-                if((ccw(l_end1,l_end2,vi_next_inf)  * ccw(vi,vi_next_inf, r_end)) > 0): #slope is comprised bw the slopes of the two half lines
-                    if(wt1.left == K.head):
-                        K.head = vi_next_inf
+                tail_end2 = K.tail
+                tail_end1 = tail_end2.right
+                head_end = K.head
+                if((ccw(tail_end1,tail_end2,vi_next_inf)  * ccw(vi,vi_next_inf, head_end)) > 0): #slope is comprised bw the slopes of the two half lines
                     wt1.left = w_d
                     w_d.right = wt1
                     w_d.left = vi_next_inf
                     vi_next_inf.right = w_d
+                    vi_next_inf.left = None
+                    K.tail = vi_next_inf
                 else:
-                    head = F1
-                    while(head.right is not None):
-                        head = head.right
-                    wr1 = head
-                    wr2 = head.left
-                    while(wr2.left is not None):
+                    wr1 = K.head
+                    wr2 = wr1.left
+                    while(True):
                         q = intersection(wr1,wr2,vi,vi_next_inf)
                         if(q is not None):
                             w_dd = Node(0,q[0],q[1])
@@ -509,60 +491,68 @@ while(i<n-1):
                     w_d.left = w_dd
                     w_d.right = wt1
                     wt1.left = w_d
-                    K.head = wr2
-    
-                    #change Ki
-                    #list becomes circular. change head to tail when Ki becomes bounded
+                    K.tail = K.head = wr2
             else:
+                print("here")
                 w_d.left = w_dd
                 w_d.right = wt1
                 w_dd.right = w_d
                 w_dd.left = ws2
                 wt1.left = w_d
                 ws2.right = w_dd
+                print(K.head,K.tail)
 
             #update F1 and L1
-            if(is_between(vi,vi.right,w_d)):
-
+            if(q is None):
+                L1 = vi_next_inf
+                if(is_between(vi,vi.right,w_d)):
+                    #case 12 F1
                     w1 = F1
                     w2 = F1.left
                     while(w2 is not None):
-                        print("here")
                         if(ccw(vi.right,w1,w2)<0):
                             F1 = w1
                             break
                         w1 = w2
                         w2 = w2.left
-            else:
-                    F1 = w_d
-            if(q is None):
-                L1 = vi_next_inf
-            else:
-                if(is_between(vi,vi.right,w_dd)):
-                    L1= w_dd
                 else:
-                    #case (11) with w_dd
+                    F1= w_d
+            else:
+                if(is_between(vi,vi.right,w_d)):
+                    #case 12 F1
+                    w1 = F1
+                    w2 = F1.left
+                    while(w2 is not None):
+                        if(ccw(vi.right,w1,w2)<0):
+                            F1 = w1
+                            break
+                        w1 = w2
+                        w2 = w2.left
+                else:
+                        F1 = w_d
+                if(is_between(vi,vi.right,w_dd)):
+                    L1 = w_dd
+                else:
+                    #case 11 w_dd
                     w1 = w_dd
-                    w2 = w_dd.left
+                    w2 = w1.left
                     while(w2 is not None):
                         if(ccw(vi.right,w1,w2)>0):
                             L1 = w1
                             break
                         w1 = w2
                         w2 = w2.left
-                    if(w2 is None):
-                        L1 = L1 #TODO: delete later
 
     vi=vi.right
     print("iter %d"%i)
     i+=1
 
-    print("F",F1.x,F1.y)
-    print("L",L1.x,L1.y)
-    display()
+    #print("F",F1.x,F1.y)
+    #print("L",L1.x,L1.y)
+
 
 P.plot()
-K.plot()
+K.kplot()
 
 plt.axis([0,win_size,0,win_size])
 plt.show()
@@ -574,29 +564,4 @@ use of math.isclose to avoid floating point errors.
 consistency in variable naming
 a single data structure that handles the transformation of a doubly linked list to a circular list.
 avoid slope tests, angle tests suggested in the paper with left tests.
-"""
-
-
-
-"""
-a = Node(0,1,2)
-b = DoublyLinkedList()
-b.append_head(a)
-a = Node(2,3,5)
-b.append_head(a)
-b.delete_node(b.head)
-
-while(b.head is not None):
-	print(b.head.v_num)
-	b.head = b.head.right
-
-
-a=Node(0,0,0)
-b=Node(1,3,3)
-c=Node(2,0,4)
-d=Node(3,4,0)
-print(intersection(a,b,c,d))
-x = [a.x,b.x,c.x,d.x]
-y = [a.y,b.y,c.y,d.y]
-plt_polygon(x,y)
 """
