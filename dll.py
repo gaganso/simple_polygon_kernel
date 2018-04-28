@@ -292,10 +292,10 @@ while(i<n-1):
     if(is_reflex(vi)): #vertex i is reflex
         vi_next_inf = inf_coord(vi,vi.right)
         vi_next_inf = Node(0,vi_next_inf[0],vi_next_inf[1])
-
-        #F1 lies on or right of the vi+1 to inf line
         left_test = ccw(vi_next_inf,vi.right,F1)
-        if(left_test<0 or math.isclose(left_test,0)):
+
+
+        if(left_test<0 or math.isclose(left_test,0)): #F1 lies on or right of the vi+1 to inf line
             p = None
             q = None
             wt1 = F1
