@@ -4,7 +4,7 @@ import copy
 import sys
 inf_d = 100
 win_size = 20
-N = 8 #number of points
+N = 12 #number of points
 
 #TODO: A function is_circular
 #TODO: If the number of vertices is less than or equal to 3, 
@@ -230,6 +230,8 @@ y = [i[1] for i in inpt]
 #plt_polygon(x,y) 
 """
 #inpt = [(1.723790322580645, 2.8192640692640696), (4.737903225806452, 4.0909090909090917), (8.4778225806451601, 1.5476190476190479), (8.5181451612903221, 6.8641774891774894), (2.0766129032258065, 9.7997835497835517), (0.42338709677419351, 3.9826839826839828)]
+inpt = [(3.588709677419355, 3.4199134199134198), (6.4919354838709671, 5.6926406926406923), (13.608870967741936, 5.4220779220779232), (15.866935483870968, 5.2326839826839837), (16.693548387096772, 10.50865800865801), (11.068548387096772, 11.212121212121213), (9.3951612903225801, 17.353896103896105), (3.9516129032258061, 18.354978354978357), (8.125, 13.511904761904763), (2.520161290322581, 10.535714285714286), (1.55241935483871, 7.1807359307359313), (1.028225806451613, 1.3365800865800868)]
+
 x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 
@@ -245,7 +247,7 @@ for i,pt in enumerate(inpt):
 P.delete_node(node)
 P.append_tail(node, make_circular=True)
 P.plot()
-plt.axis([-win_size,win_size,-win_size,win_size])
+plt.axis([0,win_size,0,win_size])
 plt.show()
 
 
@@ -562,7 +564,7 @@ while(i<n-1):
 P.plot()
 K.plot()
 
-plt.axis([-win_size,win_size,-win_size,win_size])
+plt.axis([0,win_size,0,win_size])
 plt.show()
 
 
