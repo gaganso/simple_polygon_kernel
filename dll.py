@@ -4,7 +4,11 @@ import copy
 import sys
 inf_d = 20
 win_size = 20
-N = 12 #number of points
+N = 14 #number of points
+text_x=4
+text_y=10
+text = "This Polygon needs at least two gaurds."
+font_size=12
 
 #TODO: A function is_circular
 #TODO: If the number of vertices is less than or equal to 3, 
@@ -39,8 +43,7 @@ class DoublyLinkedList():
 
     def append_k(self,node):
         if(self.head is None):
-            self.head = node
-            self.tail= node
+            self.tail = self.head = node
         else:
             node.right = self.tail
             self.tail.left = node
@@ -117,16 +120,14 @@ class DoublyLinkedList():
     def kplot(self):
         x = []
         y = []
-        if(self.head == self.tail):
-            print("ssss")
-            temp = self.head.right
+        if(self.head == self.tail and self.head.right is not None and self.tail.left is not None):
+            temp = self.head.left
             x.append(self.head.x)
             y.append(self.head.y)
             while temp != self.head:
                 x.append(temp.x)
                 y.append(temp.y)
-                temp=temp.right
-                print(temp.print())
+                temp=temp.left
             x.append(x[0])
             y.append(y[0])
         else:
@@ -164,7 +165,7 @@ class DoublyLinkedList():
                 temp = temp.right
         else:
             print("the reflex edge vertex doesn't exist.")
-
+"""
     def print(self):
         temp = self.head
 
@@ -177,7 +178,7 @@ class DoublyLinkedList():
             #print("v_num:%d\t(x,y):(%d,%d)\n"%(temp.v_num,temp.x,temp.y))
             temp.print()
             temp = temp.right
-
+"""
 
 def is_reflex(node):
     return ccw(node.left,node,node.right) <0 
@@ -251,7 +252,7 @@ x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 
 
-inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
+#inpt = [(2,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(4,11),(2,11.5),(3,8.5),(3,6),(0,4)]
 """
 #inpt = [(3,1),(5,0),(6,5),(8,8),(7,9),(5.5,13),(2,11.5),(3,8.5),(3,6),(4,4)]
 inpt = [(1,1),(2,2),(1,3),(0,2)] #convex 
@@ -262,7 +263,8 @@ y = [i[1] for i in inpt]
 """
 #inpt = [(1.723790322580645, 2.8192640692640696), (4.737903225806452, 4.0909090909090917), (8.4778225806451601, 1.5476190476190479), (8.5181451612903221, 6.8641774891774894), (2.0766129032258065, 9.7997835497835517), (0.42338709677419351, 3.9826839826839828)]
 #inpt = [(3.588709677419355, 3.4199134199134198), (6.4919354838709671, 5.6926406926406923), (13.608870967741936, 5.4220779220779232), (15.866935483870968, 5.2326839826839837), (16.693548387096772, 10.50865800865801), (11.068548387096772, 11.212121212121213), (9.3951612903225801, 17.353896103896105), (3.9516129032258061, 18.354978354978357), (8.125, 13.511904761904763), (2.520161290322581, 10.535714285714286), (1.55241935483871, 7.1807359307359313), (1.028225806451613, 1.3365800865800868)]
-
+inpt = [(3.245967741935484, 3.5010822510822512), (8.3266129032258078, 2.337662337662338), (8.3266129032258078, 5.6114718614718626), (11.471774193548388, 5.3138528138528152), (15.544354838709676, 2.283549783549784), (19.254032258064516, 4.258658008658009), (19.052419354838708, 8.0735930735930737), (18.608870967741936, 11.780303030303031), (10.362903225806452, 12.754329004329005), (5.1814516129032251, 13.701298701298704), (4.05241935483871, 18.030303030303031), (0.94758064516129004, 17.813852813852815), (3.125, 13.863636363636367), (2.0161290322580649, 9.9404761904761916)]
+#inpt = [(3.286290322580645, 4.3939393939393945), (3.3266129032258061, 8.0465367965367971), (4.9395161290322589, 8.317099567099568), (7.338709677419355, 6.9372294372294387), (10.58467741935484, 2.7164502164502169), (9.7983870967741922, 10.806277056277057), (15.06048387096774, 8.9123376623376629), (16.3508064516129, 4.2857142857142865), (16.794354838709676, 12.240259740259742), (10.362903225806452, 16.352813852813856), (8.2056451612903238, 14.458874458874462), (3.911290322580645, 15.135281385281388), (3.024193548387097, 18.030303030303031), (1.895161290322581, 14.269480519480521)]
 x = [i[0] for i in inpt]
 y = [i[1] for i in inpt]
 
@@ -285,7 +287,7 @@ plt.show()
 r_node = P.first_reflex_node()
 
 if(r_node is None):
-    print("the polygon is convex. It can be gaurded by a single gaurd and the whole of the polygon is its kernel.")
+    print("This polygon is convex. It can be gaurded by a single gaurd and the kernel of the polygon is itself.")
     plt.axis([0,win_size,0,win_size])
     plt.show()
     sys.exit()
@@ -313,7 +315,7 @@ vi = vi.right
 
 
 i = 1
-while(i<n-1):
+while(i<=n-3):
     display()
     if(is_reflex(vi)): #vertex i is reflex
         vi_next_inf = inf_coord(vi,vi.right)
@@ -332,11 +334,13 @@ while(i<n-1):
                 wt1 = wt2
                 wt2 = wt2.left
             if(wt1==L1):
+                plt.text(text_x,text_y,text,fontsize=font_size)
+                display()
                 print("Solution doesn't exist")
                 sys.exit(0)
             ws2 = F1
             ws1 = F1.right
-            while(ws1 is not None): #not checked
+            while(ws1 is not None):
                 q = intersection(ws2,ws1,vi.right,vi_next_inf)
                 if(q is not None):
                     w_dd = Node(0,q[0],q[1])
@@ -354,7 +358,7 @@ while(i<n-1):
                     w_d.left = wt2
                     w_d.right = vi_next_inf
                     vi_next_inf.left = w_d
-                    vi_next_inf.right = None
+                    #vi_next_inf.right = None
                     K.head = vi_next_inf
                 #if slope is not comprised withing the two end half lines, the edge will pierce the current K at two points making it bounded.
                 else:
@@ -371,10 +375,7 @@ while(i<n-1):
                     w_dd.left = w_d
                     w_dd.right = wr1
                     wr1.left = w_dd
-                    K.tail = K.head = wt2
-    
-                    #change Ki
-                    #list becomes circular. change head to tail when Ki becomes bounded
+                    K.tail = K.head = wt2 # K is bounded now. should head be wt2?
             else:
                 w_d.left = wt2
                 wt2.right = w_d
@@ -382,6 +383,8 @@ while(i<n-1):
                 w_dd.left = w_d
                 w_dd.right = ws1
                 ws1.left = w_dd
+                if(K.head==K.tail):
+                    K.head = K.tail = w_d
 
             if(q is None):
                 F1 = vi_next_inf
@@ -431,7 +434,8 @@ while(i<n-1):
                     break
                 w1 = w2
                 w2 = w2.left
-            if(K.head == K.tail): #bounded
+            if(K.head == K.tail and K.head.right is not None and K.tail.left is not None): #bounded
+                #case 11 L1
                 w1 = L1
                 w2 = L1.left
                 while(w2 is not None):
@@ -453,6 +457,8 @@ while(i<n-1):
                 wt2 = wt1
                 wt1 = wt1.right
             if(wt2==F1):
+                plt.text(text_x,text_y,text,fontsize=font_size)
+                display()
                 print("Solution doesn't exist")
                 sys.exit(0)
             ws1 = L1
@@ -473,8 +479,8 @@ while(i<n-1):
                     w_d.right = wt1
                     w_d.left = vi_next_inf
                     vi_next_inf.right = w_d
-                    vi_next_inf.left = None
-                    K.tail = vi_next_inf
+                    #vi_next_inf.left = None
+                    K.tail = vi_next_inf #vi_next_inf is the head?
                 else:
                     wr1 = K.head
                     wr2 = wr1.left
@@ -493,14 +499,14 @@ while(i<n-1):
                     wt1.left = w_d
                     K.tail = K.head = wr2
             else:
-                print("here")
                 w_d.left = w_dd
                 w_d.right = wt1
                 w_dd.right = w_d
                 w_dd.left = ws2
                 wt1.left = w_d
                 ws2.right = w_dd
-                print(K.head,K.tail)
+                if(K.head==K.tail):
+                    K.head = K.tail = w_d
 
             #update F1 and L1
             if(q is None):
@@ -535,21 +541,16 @@ while(i<n-1):
                 else:
                     #case 11 w_dd
                     w1 = w_dd
-                    w2 = w1.left
+                    w2 = w_dd.left
                     while(w2 is not None):
                         if(ccw(vi.right,w1,w2)>0):
                             L1 = w1
                             break
-                        w1 = w2
-                        w2 = w2.left
+                        w1=w2
+                        w2=w2.left
 
     vi=vi.right
-    print("iter %d"%i)
     i+=1
-
-    #print("F",F1.x,F1.y)
-    #print("L",L1.x,L1.y)
-
 
 P.plot()
 K.kplot()
