@@ -2,7 +2,12 @@
 The project implements the paper  "An Optimal Algorithm for Finding the Kernel of a Polygon" by Lee and Preparata.
 
 How to run?
-python3 dll.py -i [num of vertices in the polygon]
+
+python dll.py -i [num of vertices in the polygon]
+
+Example:
+
+python dll.py -i 9
 
 The user can input any number of vertices of the polygon in counter-clockwise order(This order is imposed by the algorithm since we take the left half-plane of each edge to build the kernel).
 
